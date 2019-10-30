@@ -50,7 +50,7 @@ class Player(pg.sprite.Sprite):
         self.y = y
 
     def move(self, dx=0, dy=0):
-        if not self.collide_with_walls(dx,dy):
+        #if not self.collide_with_walls(dx,dy):
             self.x += dx
             self.y += dy
         
@@ -145,7 +145,6 @@ class Game:
         # initialize all variables and do all the setup for a new game
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
-        self.player = Player(self, 10, 10)
 # =============================================================================
 #         for x in range(10, 20):
 #             Wall(self, x, 5)
@@ -154,6 +153,8 @@ class Game:
         for row in range(np.size(matrix,0)):
             for col in range(np.size(matrix,1)):
                 Organ(self,row,col,matrix[row,col])
+        
+        self.player = Player(self, 10, 10)        
         
     def run(self):
         # game loop - set self.playing = False to end the game
