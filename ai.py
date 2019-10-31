@@ -1,6 +1,5 @@
 import numpy as np
 
-
 '''
 This function determines the speed of the bot through the given artery/vein
 '''
@@ -34,12 +33,13 @@ class Organ(Vessel):
       for j in range(y, y+length):
         body[i][j] = 4
 
-def free(x, y, length, width):
-  for i in range(x, x+width):
-    for j in range(y, y+length):
-      if body[i][j] !=0:
-        return 0
-  return 1
+def free(x, y, length, width):        
+    for i in range(x, x+width):
+        for j in range(y, y+length):
+            if body[i][j] !=0:
+                return 0
+    return 1
+
 
 def create_organs(n):
   for i in range(n):
@@ -89,17 +89,54 @@ def create_entry(n):
             y = np.random.randint(0,MAP_HEIGHT)
         entry_points.append((x,y))
 
-def create_path(x_entry, y_entry, x_goal, y_goal):
-    np.random.choice([2,3], p=[0.5, 0.5])
+def get_direction(x, y, directions, c):
+    x1,y1=x,y
+    direction = np.random.choice(directions)
+    directions.remove(direction)    
+    if direction=='u':
+        x1-=1
+    elif direction=='d':
+        x1+=1
+    elif direction=='l':
+        y1-=1
+    elif direction=='r':
+        y1+=1
+    if body[x1][y1]==c or body[x1][y1]==0:
+        return direction
+    else:
+        while body[x1][y1]!=c and body[x1][y1]!=0:
+            if len(directions)==0:
+                return -1
+            x1,y1=x,y
+            direction = np.random.choice(directions)
+            directions.remove(direction)    
+            if direction=='u':
+                x1-=1
+            elif direction=='d':
+                x1+=1
+            elif direction=='l':
+                y1-=1
+            elif direction=='r':
+                y1+=1
+                
+        return direction
+
+def create_path(x_entry, y_entry, x_goal, y_goal, thick, c):
+    length = np.random.randint(2,10)
+    directions = ['u','d','l','r']
+    d = get_direction(x_entry, y_entry, directions, c)
+    if d=='u':
+        for i in range(length):
+            if body[x_entry-1][y_entry]
     
-MAP_WIDTH = 25
-MAP_HEIGHT = 25
+create_path(86,7,10,10,4,2)
+    
+MAP_WIDTH = 100
+MAP_HEIGHT = 100
 body = np.zeros((MAP_WIDTH,  MAP_HEIGHT))
-parts = {1:"Blood", 2:"Artery", 3:"Vein", 4:"Organ"}
+parts = {1:"Wall", 2:"Artery", 3:"Vein", 4:"Organ"}
 organ_list = []
 entry_points = []
 
 create_organs(7)
-create_entry(50)
-
-  
+create_entry(10)
