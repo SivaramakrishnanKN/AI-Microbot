@@ -53,30 +53,30 @@ def valid(x, y):
 
 def contact(x, y, part):
     if valid(x,y) and body[x][y].t==part:
-        return 1
+        return 0,0
     elif valid(x+1, y) and body[x+1][y].t==part:
-        return 1
+        return 1,0
     elif valid(x, y+1) and body[x][y+1].t==part:
-        return 1
+        return 0,1
     elif valid(x+1, y+1) and body[x+1][y+1].t==part:
-        return 1
+        return 1,1
     elif valid(x-1, y) and body[x-1][y].t==part:
-        return 1
+        return -1,0
     elif valid(x-1, y-1) and body[x-1][y-1].t==part:
-        return 1
+        return -1,-1
     elif valid(x+1, y-1) and body[x+1][y-1].t==part:
-        return 1
+        return 1,-1
     elif valid(x, y-1) and body[x][y-1].t==part:
-        return 1
+        return 0,-1
     elif valid(x-1, y+1) and body[x-1][y+1].t==part:
-        return 1
-    return 0
+        return -1,+1
+    return 2,2
 
 def create_entry(n):
     for i in range(n):
         x = np.random.randint(0,MAP_WIDTH)
         y = np.random.randint(0,MAP_HEIGHT)
-        while contact(x,y,4):
+        while contact(x,y,4)!=(2,2):
             x = np.random.randint(0,MAP_WIDTH)
             y = np.random.randint(0,MAP_HEIGHT)
         entry_points.append((x,y))

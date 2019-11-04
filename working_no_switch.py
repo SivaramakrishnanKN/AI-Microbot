@@ -81,49 +81,7 @@ def create_entry(n):
             y = np.random.randint(0,MAP_HEIGHT)
         entry_points.append((x,y))
 
-#def get_direction(x, y, directions, c):
-#    x1,y1=x,y
-#    if c=='A':
-#        c1='V'
-#    elif c=='V':
-#        c1='A'
-#
-#    direction = np.random.choice(directions)
-#    directions.remove(direction)    
-#    if direction=='u':
-#        x1-=1
-#    elif direction=='d':
-#        x1+=1
-#    elif direction=='l':
-#        y1-=1
-#    elif direction=='r':
-#        y1+=1
-#    if body[x1][y1].t!=c1 and valid(x1,y1):
-#        return direction
-#    else:
-#        while body[x1][y1].t==c1 or not valid(x1,y1):
-#            if len(directions)==0:
-#                return -1
-#            x1,y1=x,y
-#            direction = np.random.choice(directions)
-#            directions.remove(direction)    
-#            if direction=='u':
-#                x1-=1
-#            elif direction=='d':
-#                x1+=1
-#            elif direction=='l':
-#                y1-=1
-#            elif direction=='r':
-#                y1+=1
-#                
-#        return direction
-
-def get_direction(x, y, directions,c,min_length,max_length):
-#    x = 0
-#    y = 0
-#    c='A'
-#    min_length=2
-#    max_length=15
+def get_direction(x, y, directions,c,max_length):
     if c=='A':
         c1='V'
     elif c=='V':
@@ -136,154 +94,81 @@ def get_direction(x, y, directions,c,min_length,max_length):
         direction = np.random.choice(directions)
         directions.remove(direction)    
         if direction=='u':
-            lengths=list(range(min_length,max_length))
+            lengths=list(range(1,max_length))
             while not flag:
                 if len(lengths)==0:
                     break
                 length = np.random.choice(lengths)
                 lengths.remove(length)                
                 for i in range(length):
-                    if not valid(x-i,y) or body[x-i][y].t==c1:
+                    if body[x-i][y].t==c1 or not valid(x-i,y):
                        flag=0
                        break
-                    flag=1
+                    else:
+                        flag=1
             if flag==1:
                 return direction,length
 
         elif direction=='d':
-            lengths=list(range(min_length,max_length))
+            lengths=list(range(1,max_length))
             while not flag:
                 length = np.random.choice(lengths)
                 lengths.remove(length)
                 if len(lengths)==0:
                     break
                 for i in range(length):
-                    if not valid(x+i,y) or body[x+i][y].t==c1:
+                    if body[x+i][y].t==c1 or not valid(x+i,y):
                        flag=0
                        break
-                    flag=1
+                    else:
+                       flag=1
             if flag==1:
                 return direction,length
 
         elif direction=='l':
-            lengths=list(range(min_length,max_length))
+            lengths=list(range(1,max_length))
             while not flag:
                 length = np.random.choice(lengths)
                 lengths.remove(length)
                 if len(lengths)==0:
                     break
                 for i in range(length):
-                    if not valid(x,y-i) or body[x][y-i].t==c1:
+                    if body[x][y-i].t==c1 or not valid(x,y-i):
                        flag=0
                        break
-                    flag=1
+                    else:
+                       flag=1
             if flag==1:
                 return direction,length
 
         elif direction=='r':
-            lengths=list(range(min_length,max_length))
+            lengths=list(range(1,max_length))
             while not flag:
                 length = np.random.choice(lengths)
                 lengths.remove(length)
                 if len(lengths)==0:
                     break
                 for i in range(length):
-                    if not valid(x,y+i) or body[x][y+i].t==c1:
+                    if body[x][y+i].t==c1 or not valid(x,y+i):
                        flag=0
                        break
-                    flag=1
+                    else:
+                       flag=1
             if flag==1:
                 return direction,length
 
     return -1,-1
 
 
-def get_new_direction(x, y, directions, c):
-    x1,y1=x,y
-    if c=='A':
-        c1='V'
-    elif c=='V':
-        c1='A'
-
-    direction = np.random.choice(directions)
-    directions.remove(direction)    
-    if direction=='u':
-        x1-=1
-    elif direction=='d':
-        x1+=1
-    elif direction=='l':
-        y1-=1
-    elif direction=='r':
-        y1+=1
-    if valid(x1,y1) and body[x1][y1].t!=c1:
-        return x1,y1
-    else:
-        while not valid(x1,y1) or body[x1][y1].t==c1:
-            if len(directions)==0:
-                return -1,-1
-            x1,y1=x,y
-            direction = np.random.choice(directions)
-            directions.remove(direction)    
-            if direction=='u':
-                x1-=1
-            elif direction=='d':
-                x1+=1
-            elif direction=='l':
-                y1-=1
-            elif direction=='r':
-                y1+=1
-         
-        return x1,y1
-
-
 def create_path(x_entry, y_entry, thick, c, inc,cnt):
-    flag=0
-#    length = 0
-#    d = 0
-#    x_entry = 0
-#    y_entry = 0
-#    c = 'A'
-#    thick = 4
-    if c=='A':
-        c1='V'
-    elif c=='V':
-        c1='A'
-
-
-    while not flag:
-        length = np.random.randint(2,15)
-        directions = ['u','d','l','r']
-        d,length = get_direction(x_entry, y_entry, directions, c, 2,15)
-        if d==-1:
-            print("Not possible",x_entry,y_entry,c, thick)
-            return
-        if d=='u':
-            for i in range(length):
-                if body[x_entry-i][y_entry].t==c1 or not valid(x_entry-i,y_entry):
-                    flag=0
-                    break
-                flag=1
-        elif d=='d':
-            for i in range(length):
-                if body[x_entry+i][y_entry].t==c1 or not valid(x_entry+i,y_entry):
-                    flag=0
-                    break
-                flag=1
-        elif d=='l':
-            for i in range(length):
-                if body[x_entry][y_entry-i].t==c1 or not valid(x_entry,y_entry-i):
-                    flag=0
-                    break
-                flag=1
-        elif d=='r':
-            for i in range(length):
-                if body[x_entry][y_entry+i].t==c1 or not valid(x_entry,y_entry+i):
-                    flag=0
-                    break
-                flag=1
-    print(length,d,c,thick)                
+    directions = ['u','d','l','r']
+    d,length = get_direction(x_entry, y_entry, directions, c, 25)
+    if d==-1:
+        print('Not Possible', x_entry, y_entry)
+        return
+    print(length,d)                
     
-    for i in range(length):
+    for i in range(1,length):
         if d=='u':
             if body[x_entry-i][y_entry].t==4:
                 print(x_entry-i,y_entry)
@@ -291,18 +176,14 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
             if body[x_entry-i][y_entry].t==0:
                 if c=='V':
                     body[x_entry-i][y_entry] = Vessel(thick, set(['u']),c)    
-                    print(1)
                 else:
                     body[x_entry-i][y_entry] = Vessel(thick, set(['u','d']),c)
-                    print(2)
             else:
                 if c=='V':
                     body[x_entry-i][y_entry].directions.add('u')
-                    print(3)
                 else:
                     body[x_entry-i][y_entry].directions.add('u')
                     body[x_entry-i][y_entry].directions.add('d')
-                    print(4)
                 body[x_entry-i][y_entry].thickness=max(body[x_entry-i][y_entry].thickness,thick)
 
         elif d=='d':
@@ -332,19 +213,15 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
                 return
             if body[x_entry][y_entry-i].t==0:
                 if c=='V':
-                    print(1)
                     body[x_entry][y_entry-i] = Vessel(thick, set(['l']),c)    
                 else:
                     body[x_entry][y_entry-i] = Vessel(thick, set(['l','r']),c)
-                    print(2)
             else:
                 if c=='V':
                     body[x_entry][y_entry-i].directions.add('l')
-                    print(3)
                 else:
                     body[x_entry][y_entry-i].directions.add('l')
                     body[x_entry][y_entry-i].directions.add('r')
-                    print(4)
                 body[x_entry][y_entry-i].thickness=max(body[x_entry][y_entry-i].thickness,thick)
 
         elif d=='r':
@@ -367,34 +244,41 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
                     body[x_entry][y_entry+i].directions.add('l')
                     print(4)
                 body[x_entry][y_entry+i].thickness=max(body[x_entry][y_entry+i].thickness,thick)
-
-    print("Appended")
-    length-=1    
-    # Generating new thickness
+    
+    
+    length-=1
     if inc:
         new_thick = np.random.randint(thick,11)
     else:
-        new_thick = np.random.randint(1,thick+1)
-    # Recursively generating new path from the end point
+        new_thick = np.random.randint(1,thick+1)    
     if d=='u':
         if new_thick<2:
-            # Case to swap Artery and Vein
             if cnt==3:
                 return
             if c == 'A':
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry-length,y_entry,directions,'V')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'V', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry-length-1,y_entry,new_thick,'V', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry-length+1,y_entry,new_thick,'V', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry-length,y_entry-1,new_thick,'V', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry-length,y_entry+1,new_thick,'V', not inc,cnt+1)
             else:
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry-length,y_entry,directions,'A')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'A', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry-length-1,y_entry,new_thick,'A', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry-length+1,y_entry,new_thick,'A', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry-length,y_entry-1,new_thick,'A', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry-length,y_entry+1,new_thick,'A', not inc,cnt+1)
         else:
             if new_thick==10:
                 create_path(x_entry-length,y_entry,new_thick,c,not inc,cnt)
@@ -406,19 +290,29 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
             if cnt==3:
                 return
             if c == 'A':
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry+length,y_entry,directions,'V')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'V', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry+length-1,y_entry,new_thick,'V', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry+length+1,y_entry,new_thick,'V', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry+length,y_entry-1,new_thick,'V', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry+length,y_entry+1,new_thick,'V', not inc,cnt+1)
             else:
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry-length,y_entry,directions,'A')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'A', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry+length-1,y_entry,new_thick,'A', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry+length+1,y_entry,new_thick,'A', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry+length,y_entry-1,new_thick,'A', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry+length,y_entry+1,new_thick,'A', not inc,cnt+1)
         else:
             if new_thick==10:
                 create_path(x_entry+length,y_entry,new_thick,c,not inc,cnt)
@@ -430,19 +324,29 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
             if cnt==3:
                 return
             if c == 'A':
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry,y_entry-length,directions,'V')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'V', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry-1,y_entry-length,new_thick,'V', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry+1,y_entry-length,new_thick,'V', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry,y_entry-length-1,new_thick,'V', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry,y_entry-length+1,new_thick,'V', not inc,cnt+1)
             else:
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry,y_entry-length,directions,'A')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'A', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry-1,y_entry-length,new_thick,'A', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry+1,y_entry-length,new_thick,'A', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry,y_entry-length-1,new_thick,'A', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry,y_entry-length+1,new_thick,'A', not inc,cnt+1)
         else:
             if new_thick==10:
                 create_path(x_entry,y_entry-length,new_thick,c,not inc,cnt)
@@ -454,19 +358,29 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
             if cnt==3:
                 return
             if c == 'A':
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry,y_entry+length,directions,'V')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'V', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry-1,y_entry+length,new_thick,'A', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry+1,y_entry+length,new_thick,'A', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry,y_entry+length-1,new_thick,'A', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry,y_entry+length+1,new_thick,'A', not inc,cnt+1)
             else:
-                directions = ['u','d','l','r']
-                x1,y1=get_new_direction(x_entry,y_entry+length,directions,'A')
-                if x1==-1:
-                    print("Snake")
-                    return 
-                create_path(x1,y1,new_thick,'A', not inc,cnt+1)
+                d=get_direction(x_entry-length, y_entry, ['u','d','l','r'],'V',2)
+                if d==-1:
+                    return
+                if d=='u':
+                    create_path(x_entry-1,y_entry+length,new_thick,'V', not inc,cnt+1)
+                elif d=='d':
+                    create_path(x_entry+1,y_entry+length,new_thick,'V', not inc,cnt+1)
+                elif d=='l':
+                    create_path(x_entry,y_entry+length-1,new_thick,'V', not inc,cnt+1)
+                elif d=='r':
+                    create_path(x_entry,y_entry+length+1,new_thick,'V', not inc,cnt+1)
         else:
             if new_thick==10:
                 create_path(x_entry,y_entry+length,new_thick,c,not inc,cnt)
@@ -483,10 +397,12 @@ organ_list = []
 entry_points = []
 
 create_organs(7)
-create_entry(30)
+create_entry(10)
 
-for x,y in entry_points:
-    create_path(x,y,10,'V',0,-25)
+
+body[8][4].thickness
+
+create_path(0,0,10,'V',0,0)
 
 for i in range(MAP_WIDTH):
     for j in range(MAP_HEIGHT):
@@ -496,7 +412,3 @@ for i in range(MAP_WIDTH):
             b[i][j] = 3
         else:
             b[i][j]=body[i][j].t
-
-#np.save("body.npy",body)
-x,y = entry_points[np.random.choice(len(entry_points))]
-print(body[x][y].directions)

@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Oct 23 21:10:13 2019
-
-@author: Varun
-"""
-
 import pygame as pg
 from settings import *
 
