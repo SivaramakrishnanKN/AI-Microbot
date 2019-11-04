@@ -215,7 +215,7 @@ def get_new_direction(x, y, directions, c):
         y1-=1
     elif direction=='r':
         y1+=1
-    if valid(x1,y1) or body[x1][y1].t!=c1:
+    if valid(x1,y1) and body[x1][y1].t!=c1:
         return x1,y1
     else:
         while not valid(x1,y1) or body[x1][y1].t==c1:
@@ -248,11 +248,12 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
         c1='V'
     elif c=='V':
         c1='A'
+
+
     while not flag:
         length = np.random.randint(2,15)
         directions = ['u','d','l','r']
         d,length = get_direction(x_entry, y_entry, directions, c, 2,15)
-        print(length,d,c,thick)                
         if d==-1:
             print("Not possible",x_entry,y_entry,c, thick)
             return
@@ -280,6 +281,7 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
                     flag=0
                     break
                 flag=1
+    print(length,d,c,thick)                
     
     for i in range(length):
         if d=='u':
@@ -481,14 +483,10 @@ organ_list = []
 entry_points = []
 
 create_organs(7)
-create_entry(25)
-
-
-#body[0][7]= Vessel(4,['d'],'V')
+create_entry(30)
 
 for x,y in entry_points:
-    create_path(x,y,10,'V',0,-10)
-
+    create_path(x,y,10,'V',0,-25)
 
 for i in range(MAP_WIDTH):
     for j in range(MAP_HEIGHT):
@@ -498,3 +496,5 @@ for i in range(MAP_WIDTH):
             b[i][j] = 3
         else:
             b[i][j]=body[i][j].t
+
+#np.save("body.npy",body)
