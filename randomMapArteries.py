@@ -5,13 +5,13 @@ Created on Wed Oct 23 20:57:23 2019
 @author: Varun
 """
 
-# Tile-based game - Part 1
-# Video link: https://youtu.be/3UxnelT9aCo
 import pygame as pg
 import sys
 from settings import *
 from sprites import *
 import numpy as np
+#from snake import *
+
 
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -26,17 +26,17 @@ BLUE = (127,255,212)
 ORCHID = (153,50,204)
 
 # game settings
-WIDTH = 1024   # 16 * 64 or 32 * 32 or 64 * 16
-HEIGHT = 768  # 16 * 48 or 32 * 24 or 64 * 12
+WIDTH = 1000   # 16 * 64 or 32 * 32 or 64 * 16
+HEIGHT = 1000  # 16 * 48 or 32 * 24 or 64 * 12
 FPS = 60
 TITLE = "Tilemap Demo"
 BGCOLOR = DARKGREY
 
-TILESIZE = 32
+TILESIZE = 10
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
-matrix = np.random.randint(0,4,(32,24))
+#matrix = np.random.randint(0,4,(int(GRIDWIDTH),int(GRIDHEIGHT)))
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -50,7 +50,7 @@ class Player(pg.sprite.Sprite):
         self.y = y
 
     def move(self, dx=0, dy=0):
-        #if not self.collide_with_walls(dx,dy):
+        if not self.collide_with_walls(dx,dy) and self.allowed_direction(dx,dy) :
             self.x += dx
             self.y += dy
         
@@ -60,32 +60,45 @@ class Player(pg.sprite.Sprite):
             if wall.x == self.x+dx and wall.y == self.y+dy:
                 return True
         return False    
-        
+   
+    def allowed_direction(self,dx=0,dy=0):
+        print(body[self.y][self.x].directions)
+        if dx>0:
+            if 'r' in body[self.y][self.x].directions :
+                return True
+        if dx<0:
+            if 'l' in body[self.y][self.x].directions :
+                return True
+        if dy>0:
+            if 'd' in body[self.y][self.x].directions :
+                return True
+        if dy<0:
+            if 'u' in body[self.y][self.x].directions :
+                return True
+        return False    
         
     def update(self):
         self.rect.x = self.x * TILESIZE
         self.rect.y = self.y * TILESIZE
 
-# =============================================================================
-# class Wall(pg.sprite.Sprite):
-#     def __init__(self, game, x, y):
-#         self.groups = game.all_sprites, game.walls
-#         pg.sprite.Sprite.__init__(self, self.groups)
-#         self.game = game
-#         self.image = pg.Surface((TILESIZE, TILESIZE))
-#         self.image.fill(GREEN)
-#         self.rect = self.image.get_rect()
-#         self.x = x
-#         self.y = y
-#         self.rect.x = x * TILESIZE
-#         self.rect.y = y * TILESIZE
-# 
-# =============================================================================
+class Wall(pg.sprite.Sprite):
+     def __init__(self, game, x, y):
+         self.groups = game.all_sprites, game.walls
+         pg.sprite.Sprite.__init__(self, self.groups)
+         self.game = game
+         self.image = pg.Surface((TILESIZE, TILESIZE))
+         self.image.fill(LIGHTGREY)
+         self.rect = self.image.get_rect()
+         self.x = x
+         self.y = y
+         self.rect.x = x * TILESIZE
+         self.rect.y = y * TILESIZE
+
         
 class Organ(pg.sprite.Sprite):
     def __init__(self,game,x,y,val):
-        if val == 0:
-            self.groups = game.all_sprites, game.walls
+        if val == 1:
+            self.groups = game.all_sprites
             pg.sprite.Sprite.__init__(self,self.groups)
             self.game = game
             self.image = pg.Surface((TILESIZE, TILESIZE))
@@ -95,8 +108,8 @@ class Organ(pg.sprite.Sprite):
             self.y = y
             self.rect.x = x * TILESIZE
             self.rect.y = y * TILESIZE    
-        elif val == 1:
-            self.groups = game.all_sprites, game.walls
+        elif val == 2:
+            self.groups = game.all_sprites
             pg.sprite.Sprite.__init__(self,self.groups)
             self.game = game
             self.image = pg.Surface((TILESIZE, TILESIZE))
@@ -106,23 +119,23 @@ class Organ(pg.sprite.Sprite):
             self.y = y
             self.rect.x = x * TILESIZE
             self.rect.y = y * TILESIZE    
-        elif val == 2:
-            self.groups = game.all_sprites, game.walls
+        elif val == 3:
+            self.groups = game.all_sprites
             pg.sprite.Sprite.__init__(self,self.groups)
             self.game = game
             self.image = pg.Surface((TILESIZE, TILESIZE))
-            self.image.fill(BLUE)
+            self.image.fill(PINK)
             self.rect = self.image.get_rect()
             self.x = x
             self.y = y
             self.rect.x = x * TILESIZE
             self.rect.y = y * TILESIZE    
-        elif val == 3:
-            self.groups = game.all_sprites, game.walls
+        elif val == 4:
+            self.groups = game.all_sprites
             pg.sprite.Sprite.__init__(self,self.groups)
             self.game = game
             self.image = pg.Surface((TILESIZE, TILESIZE))
-            self.image.fill(PINK)
+            self.image.fill(DARKGREY)
             self.rect = self.image.get_rect()
             self.x = x
             self.y = y
@@ -145,16 +158,18 @@ class Game:
         # initialize all variables and do all the setup for a new game
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
-# =============================================================================
-#         for x in range(10, 20):
-#             Wall(self, x, 5)
-# =============================================================================
+
         
-        for row in range(np.size(matrix,0)):
-            for col in range(np.size(matrix,1)):
-                Organ(self,row,col,matrix[row,col])
+        for row in range(np.size(b,0)):
+            for col in range(np.size(b,1)):
+                if body[row][col].t==0:
+                    Wall(self,row,col)
+                else:
+                    Organ(self,row,col,b[row,col])
         
-        self.player = Player(self, 10, 10)        
+        
+        xe,ye = entry_points[np.random.choice(len(entry_points))]
+        self.player = Player(self, xe, ye)        
         
     def run(self):
         # game loop - set self.playing = False to end the game
