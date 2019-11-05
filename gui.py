@@ -43,8 +43,9 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(YELLOW)
+        self.image.fill(DARKGREY)
         self.score=10000
+        self.goal=0
 #        self.image = pg.image.load(os.path.abspath("goku.gif"))
 #        self.image = pg.transform.scale(self.image, (50, 50))
 
@@ -67,8 +68,12 @@ class Player(pg.sprite.Sprite):
                     for y in range(organ.y,organ.y+organ.length):
                         if contact(self.y,self.x,4)[1]==g.goal_organ:
                             Organ(g,y,x,5)
+                            self.goal=1
                         else:
                             Organ(g,y,x,6)
+                            self.goal=-1
+            else:
+                self.goal=0
 #                sys.exit()
 #            flag=0
 #            for d in body[self.y][self.x].directions:
@@ -220,11 +225,19 @@ class Game:
         
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
-        pg.key.set_repeat(500, 50)
+        pg.key.set_repeat(100, 50)
         self.load_data()
 
     def load_data(self):
         pass
+
+    def print_stat(self,t):
+        font = pg.font.Font('freesansbold.ttf',15)
+        text3 = font.render(t, True, WHITE)
+        TextRect = text3.get_rect()
+        TextRect.center = (WIDTH+(200/2),650)
+        self.screen.blit(text3,TextRect)
+
 
     def new(self):
         # initialize all variables and do all the setup for a new game
@@ -286,43 +299,105 @@ class Game:
         scoreboard = pg.Surface((200,HEIGHT))
         scoreboard.fill(DARKGREY)        
         self.screen.blit(scoreboard,(WIDTH,0))
-        font = pg.font.Font('freesansbold.ttf',32)
+        
+        font = pg.font.Font('Antonio-Regular.ttf',32)
         text = font.render("Scoreboard", True, WHITE)
         TextRect = text.get_rect()
-        TextRect.center = (WIDTH+(200/2),20)
+        TextRect.center = (WIDTH+(200/2),40)
         self.screen.blit(text,TextRect)
 
-        font = pg.font.Font('freesansbold.ttf',16)
-        t="Score: "+str(self.player.score)
+        if self.player.goal==1:
+            font = pg.font.Font('Antonio-Bold.ttf',35)
+            text3 = font.render("SUCCESSFUL", True, GREEN)
+            TextRect = text3.get_rect()
+            TextRect.center = (WIDTH+(200/2),600)
+            self.screen.blit(text3,TextRect)
+        if self.player.goal==-1:
+            self.player.score-=10
+            font = pg.font.Font('Antonio-Bold.ttf',35)
+            text3 = font.render("FAILED", True, RED)
+            TextRect = text3.get_rect()
+            TextRect.center = (WIDTH+(200/2),600)
+            self.screen.blit(text3,TextRect)
+
+
+        pg.draw.rect(self.screen,RED,(WIDTH+10,75,180,60))        
+        pg.draw.rect(self.screen,BLACK,(WIDTH+15,80,170,50))        
+
+#        board = pg.image.load('score.png')
+#        board = pg.transform.scale(board, (190,80))
+#        self.screen.blit(board, (WIDTH+5,75))
+        
+        font = pg.font.Font('digital-7.ttf',35)
+        t=str(self.player.score)
         text1 = font.render(t, True, WHITE)
         TextRect = text1.get_rect()
         TextRect.center = (WIDTH+(200/2),100)
         self.screen.blit(text1,TextRect)
         
         
-        font = pg.font.Font('freesansbold.ttf',16)
-        t="AI predicted Direction: "+self.player.next
+        font = pg.font.Font('freesansbold.ttf',15)
+        t="Recommended Direction"
         text1 = font.render(t, True, WHITE)
         TextRect = text1.get_rect()
         TextRect.center = (WIDTH+(200/2),200)
         self.screen.blit(text1,TextRect)
+
+        d = self.player.next
+        if d=='d':
+            board = pg.image.load('down.png')
+            board = pg.transform.scale(board, (50,50))
+            self.screen.blit(board, (WIDTH+75,300))
+        elif d=='u':
+            board = pg.image.load('up.png')
+            board = pg.transform.scale(board, (50,50))
+            self.screen.blit(board, (WIDTH+75,200))
+        elif d=='l':
+            board = pg.image.load('left.png')
+            board = pg.transform.scale(board, (50,50))
+            self.screen.blit(board, (WIDTH+25,250))
+        elif d=='r':
+            board = pg.image.load('right.png')
+            board = pg.transform.scale(board, (50,50))
+            self.screen.blit(board, (WIDTH+125,250))
         
 
-        font = pg.font.Font('freesansbold.ttf',16)
+        font = pg.font.Font('freesansbold.ttf',15)
         text1 = font.render("Moves Available", True, WHITE)
         TextRect = text1.get_rect()
         TextRect.center = (WIDTH+(200/2),400)
         self.screen.blit(text1,TextRect)
         
-        count=1
         for d in body[self.player.y][self.player.x].directions:
-            font = pg.font.Font('freesansbold.ttf',16)
-            text = font.render(d, True, WHITE)
-            TextRect = text.get_rect()
-            TextRect.center = (WIDTH+(200/2),400+count*20)
-            self.screen.blit(text,TextRect)
-            count+=1
+            if d=='d':
+                board = pg.image.load('down.png')
+                board = pg.transform.scale(board, (50,50))
+                self.screen.blit(board, (WIDTH+75,500))
+            elif d=='u':
+                board = pg.image.load('up.png')
+                board = pg.transform.scale(board, (50,50))
+                self.screen.blit(board, (WIDTH+75,400))
+            elif d=='l':
+                board = pg.image.load('left.png')
+                board = pg.transform.scale(board, (50,50))
+                self.screen.blit(board, (WIDTH+25,450))
+            elif d=='r':
+                board = pg.image.load('right.png')
+                board = pg.transform.scale(board, (50,50))
+                self.screen.blit(board, (WIDTH+125,450))
+
+#                font = pg.font.Font('freesansbold.ttf',16)
+#                text = font.render(d, True, WHITE)
+#                TextRect = text.get_rect()
+#                TextRect.center = (WIDTH+(200/2),400+count*20)
+#                self.screen.blit(text,TextRect)
+#                count+=1
     
+        font = pg.font.Font('freesansbold.ttf',15)
+        text3 = font.render("Press R to reset game", True, WHITE)
+        TextRect = text3.get_rect()
+        TextRect.center = (WIDTH+(200/2),650)
+        self.screen.blit(text3,TextRect)
 
 
         pg.display.flip()
@@ -361,7 +436,9 @@ class Game:
                 if event.key == pg.K_DOWN:
                     if 'd' in body[self.player.y][self.player.x].directions:
                         self.player.move(dy=+1)
-
+                if event.key == pg.K_r:
+                    self.new()
+                    
     def show_start_screen(self):
         pass
 

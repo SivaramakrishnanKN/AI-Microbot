@@ -531,13 +531,13 @@ def next_direction(x,y,xg,yg):
     c=[]
     for d in body[x][y].directions:
         if d=='d':
-            c.append([cost(x+1,y,xg,yg)+look_ahead(x-1,y,xg,yg,1),'d'])
+            c.append([cost(x+1,y,xg,yg)+look_ahead(x-1,y,xg,yg,4),'d'])
         elif d=='u':
-            c.append([cost(x-1,y,xg,yg)+look_ahead(x-1,y,xg,yg,1),'u'])
+            c.append([cost(x-1,y,xg,yg)+look_ahead(x-1,y,xg,yg,4),'u'])
         elif d=='l':
-            c.append([cost(x,y-1,xg,yg)+look_ahead(x-1,y,xg,yg,1),'l'])
+            c.append([cost(x,y-1,xg,yg)+look_ahead(x-1,y,xg,yg,4),'l'])
         elif d=='r':
-            c.append([cost(x,y+1,xg,yg)+look_ahead(x-1,y,xg,yg,1),'r'])
+            c.append([cost(x,y+1,xg,yg)+look_ahead(x-1,y,xg,yg,4),'r'])
     print(c)
     if len(c)==0:
         return
