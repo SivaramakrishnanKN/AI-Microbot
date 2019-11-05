@@ -477,7 +477,71 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
                 create_path(x_entry,y_entry+length,new_thick,c,not inc,cnt)
             else:
                 create_path(x_entry,y_entry+length,new_thick,c,inc,cnt)
+import numpy as np
+import math
 
+def distance(x,y, xg, yg):
+    return abs(x-xg)+abs(y-yg)
+
+
+def cost(x,y,xg,yg):
+    cost=0
+    cost+=(4-len(body[x][y].directions))
+    cost+=body[x][y].thickness
+    if body[x][y].t=='A':
+        cost-=5
+    cost+=0.5*distance(x,y,xg,yg)
+    return cost
+
+
+    
+
+def look_ahead(x,y,xg,yg,count):
+    if count==1:
+        c=[]
+        for d in body[x][y].directions:
+            if d=='d':
+                c.append(cost(x+1,y,xg,yg))
+            elif d=='u':
+                c.append(cost(x-1,y,xg,yg))
+            elif d=='l':
+                c.append(cost(x,y-1,xg,yg))
+            elif d=='r':
+                c.append(cost(x,y+1,xg,yg))
+        if len(c)==0:
+            return 0
+    
+        return min(c)
+    c=[]
+    for d in body[x][y].directions:
+        if d=='d':
+            c.append(cost(x+1,y,xg,yg)+look_ahead(x-1,y,xg,yg,count-1))
+        elif d=='u':
+            c.append(cost(x-1,y,xg,yg)+look_ahead(x-1,y,xg,yg,count-1))
+        elif d=='l':
+            c.append(cost(x,y-1,xg,yg)+look_ahead(x-1,y,xg,yg,count-1))
+        elif d=='r':
+            c.append(cost(x,y+1,xg,yg)+look_ahead(x-1,y,xg,yg,count-1))
+    if len(c)==0:
+        return 0
+    return min(c)
+
+
+def next_direction(x,y,xg,yg):
+    c=[]
+    for d in body[x][y].directions:
+        if d=='d':
+            c.append([cost(x+1,y,xg,yg)+look_ahead(x-1,y,xg,yg,1),'d'])
+        elif d=='u':
+            c.append([cost(x-1,y,xg,yg)+look_ahead(x-1,y,xg,yg,1),'u'])
+        elif d=='l':
+            c.append([cost(x,y-1,xg,yg)+look_ahead(x-1,y,xg,yg,1),'l'])
+        elif d=='r':
+            c.append([cost(x,y+1,xg,yg)+look_ahead(x-1,y,xg,yg,1),'r'])
+    print(c)
+    if len(c)==0:
+        return
+    return(min(c)[1])
 
 MAP_WIDTH = 100
 MAP_HEIGHT = 100

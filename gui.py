@@ -18,7 +18,7 @@ YELLOW = (255, 255, 0)
 PINK = (255,192,203)
 BLUE = (127,255,212)
 ORCHID = (153,50,204)
-
+HOT_PINK = (255,105,180)
 # game settings
 WIDTH = 700   # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
@@ -32,6 +32,11 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 
 #matrix = np.random.randint(0,4,(int(GRIDWIDTH),int(GRIDHEIGHT)))
 
+def text_objects(text, font):
+    textSurface = font.render(text, True, BLACK)
+    return textSurface, textSurface.get_rect()
+
+
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
@@ -39,26 +44,28 @@ class Player(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(YELLOW)
+        self.score=10000
 #        self.image = pg.image.load(os.path.abspath("goku.gif"))
 #        self.image = pg.transform.scale(self.image, (50, 50))
 
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
-
+        self.next = next_direction(self.y,self.x,g.xg,g.yg)
     def move(self, dx=0, dy=0):
         if not self.collide_with_walls(dx,dy): #and self.allowed_direction(dx,dy) :
             self.x += dx
             self.y += dy
+            self.score-=cost(self.y,self.x,g.xg,g.yg)
             print(body[self.y][self.x].directions, self.x, self.y)
 #            pg.key.set_repeat(body[self.y][self.x].thickness*25, 50)
-        
+            self.next = next_direction(self.y,self.x,g.xg,g.yg)
             if contact(self.y,self.x,4)!=(0,0):
                 print("Goal")
                 organ=organ_list[contact(self.y,self.x,4)[1]]
                 for x in range(organ.x,organ.x+organ.width):
                     for y in range(organ.y,organ.y+organ.length):
-                        if contact(self.y,self.x,4)[1]==goal_organ:
+                        if contact(self.y,self.x,4)[1]==g.goal_organ:
                             Organ(g,y,x,5)
                         else:
                             Organ(g,y,x,6)
@@ -194,11 +201,23 @@ class Organ(pg.sprite.Sprite):
             self.y = y
             self.rect.x = x * TILESIZE
             self.rect.y = y * TILESIZE   
+        elif val == 7:
+            self.groups = game.all_sprites
+            pg.sprite.Sprite.__init__(self,self.groups)
+            self.game = game
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image.fill(HOT_PINK)
+            self.rect = self.image.get_rect()
+            self.x = x
+            self.y = y
+            self.rect.x = x * TILESIZE
+            self.rect.y = y * TILESIZE   
 
 class Game:
     def __init__(self):
         pg.init()
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pg.display.set_mode((WIDTH+200, HEIGHT))
+        
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         pg.key.set_repeat(500, 50)
@@ -222,7 +241,15 @@ class Game:
         
         ye,xe = entry_points[np.random.choice(len(entry_points))]
         print(xe,ye)
-        goal_organ = np.random.choice(len(organ_list))
+        
+        self.goal_organ = np.random.choice(len(organ_list))
+        organ = organ_list[self.goal_organ]
+        for x in range(organ.x,organ.x+organ.width):
+            for y in range(organ.y,organ.y+organ.length):
+                Organ(g,y,x,7)
+                
+        self.xg,self.yg = organ_list[self.goal_organ].centroid
+
         self.player = Player(self, xe, ye)        
         
     def run(self):
@@ -230,6 +257,10 @@ class Game:
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
+            
+#            pg.time.wait(10000)
+#            self.automate()
+#            
             self.events()
             self.update()
             self.draw()
@@ -252,9 +283,65 @@ class Game:
         self.screen.fill(BGCOLOR)
         self.draw_grid()
         self.all_sprites.draw(self.screen)
-        pg.display.flip()
+        scoreboard = pg.Surface((200,HEIGHT))
+        scoreboard.fill(DARKGREY)        
+        self.screen.blit(scoreboard,(WIDTH,0))
+        font = pg.font.Font('freesansbold.ttf',32)
+        text = font.render("Scoreboard", True, WHITE)
+        TextRect = text.get_rect()
+        TextRect.center = (WIDTH+(200/2),20)
+        self.screen.blit(text,TextRect)
 
-    def events(self):
+        font = pg.font.Font('freesansbold.ttf',16)
+        t="Score: "+str(self.player.score)
+        text1 = font.render(t, True, WHITE)
+        TextRect = text1.get_rect()
+        TextRect.center = (WIDTH+(200/2),100)
+        self.screen.blit(text1,TextRect)
+        
+        
+        font = pg.font.Font('freesansbold.ttf',16)
+        t="AI predicted Direction: "+self.player.next
+        text1 = font.render(t, True, WHITE)
+        TextRect = text1.get_rect()
+        TextRect.center = (WIDTH+(200/2),200)
+        self.screen.blit(text1,TextRect)
+        
+
+        font = pg.font.Font('freesansbold.ttf',16)
+        text1 = font.render("Moves Available", True, WHITE)
+        TextRect = text1.get_rect()
+        TextRect.center = (WIDTH+(200/2),400)
+        self.screen.blit(text1,TextRect)
+        
+        count=1
+        for d in body[self.player.y][self.player.x].directions:
+            font = pg.font.Font('freesansbold.ttf',16)
+            text = font.render(d, True, WHITE)
+            TextRect = text.get_rect()
+            TextRect.center = (WIDTH+(200/2),400+count*20)
+            self.screen.blit(text,TextRect)
+            count+=1
+    
+
+
+        pg.display.flip()
+        
+    def automate(self):
+        next_dir = self.next
+        if next_dir == 'u':
+            self.player.move(dy=-1)
+        elif next_dir == 'd':
+            self.player.move(dy=+1)
+        elif next_dir == 'l':
+            self.player.move(dx=-1)
+        elif next_dir == 'r':    
+            self.player.move(dx=+1)
+        else:
+            print("Not possible")
+            pg.quit()
+            sys.exit()
+    def events(self):    
         # catch all events here
         for event in pg.event.get():
             if event.type == pg.QUIT:
