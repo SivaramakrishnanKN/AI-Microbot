@@ -3,17 +3,21 @@ import numpy as np
 '''
 This function determines the speed of the bot through the given artery/vein
 '''
-def speed(width):
-  return 1/width  
+def speed(max_speed,width):
+  return max_speed/width  
 
-    
+'''
+This class determines what type of vessel is present in a particular coordinate in the body
+'''    
 class Vessel():
     def __init__(self, thickness, directions, t):
         self.t = t
         self.directions = directions
         self.thickness = thickness
     
-  
+'''
+This class contains information about each Organ
+'''
 class Organ():
   def __init__(self, x, y, width, length, index):    
     self.index = index
@@ -21,9 +25,10 @@ class Organ():
     self.y=y
     self.width=width
     self.length=length
+    self.centroid=(x+width/2,y+length/2)
     for i in range(x, x+width):
       for j in range(y, y+length):
-        body[i][j] = Vessel(0,[],4)
+        body[i][j] = Vessel(index,['d','u','l','r'],4)
 
 def free(x, y, length, width):        
     for i in range(x, x+width):
@@ -53,30 +58,30 @@ def valid(x, y):
 
 def contact(x, y, part):
     if valid(x,y) and body[x][y].t==part:
-        return 0,0
+        return 1,body[x][y].thickness
     elif valid(x+1, y) and body[x+1][y].t==part:
-        return 1,0
+        return 1,body[x+1][y].thickness
     elif valid(x, y+1) and body[x][y+1].t==part:
-        return 0,1
+        return 1,body[x][y+1].thickness
     elif valid(x+1, y+1) and body[x+1][y+1].t==part:
-        return 1,1
+        return 1,body[x+1][y+1].thickness
     elif valid(x-1, y) and body[x-1][y].t==part:
-        return -1,0
+        return 1,body[x-1][y].thickness
     elif valid(x-1, y-1) and body[x-1][y-1].t==part:
-        return -1,-1
+        return 1,body[x-1][y-1].thickness
     elif valid(x+1, y-1) and body[x+1][y-1].t==part:
-        return 1,-1
+        return 1,body[x+1][y-1].thickness
     elif valid(x, y-1) and body[x][y-1].t==part:
-        return 0,-1
+        return 1,body[x][y-1].thickness
     elif valid(x-1, y+1) and body[x-1][y+1].t==part:
-        return -1,+1
-    return 2,2
+        return 1,body[x-1][y+1].thickness
+    return 0,0
 
 def create_entry(n):
     for i in range(n):
         x = np.random.randint(0,MAP_WIDTH)
         y = np.random.randint(0,MAP_HEIGHT)
-        while contact(x,y,4)!=(2,2):
+        while contact(x,y,4)!=(0,0):
             x = np.random.randint(0,MAP_WIDTH)
             y = np.random.randint(0,MAP_HEIGHT)
         entry_points.append((x,y))
@@ -472,6 +477,7 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
                 create_path(x_entry,y_entry+length,new_thick,c,not inc,cnt)
             else:
                 create_path(x_entry,y_entry+length,new_thick,c,inc,cnt)
+
 
 MAP_WIDTH = 100
 MAP_HEIGHT = 100

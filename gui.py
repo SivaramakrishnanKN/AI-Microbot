@@ -20,13 +20,13 @@ BLUE = (127,255,212)
 ORCHID = (153,50,204)
 
 # game settings
-WIDTH = 800   # 16 * 64 or 32 * 32 or 64 * 16
-HEIGHT = 800  # 16 * 48 or 32 * 24 or 64 * 12
+WIDTH = 700   # 16 * 64 or 32 * 32 or 64 * 16
+HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
 FPS = 60
-TITLE = "Tilemap Demo"
+TITLE = "AI MicroBot"
 BGCOLOR = DARKGREY
 
-TILESIZE = 8
+TILESIZE = 7
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
@@ -39,6 +39,9 @@ class Player(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(YELLOW)
+#        self.image = pg.image.load(os.path.abspath("goku.gif"))
+#        self.image = pg.transform.scale(self.image, (50, 50))
+
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -48,11 +51,17 @@ class Player(pg.sprite.Sprite):
             self.x += dx
             self.y += dy
             print(body[self.y][self.x].directions, self.x, self.y)
-
-            if contact(self.y,self.x,4)!=(2,2):
+#            pg.key.set_repeat(body[self.y][self.x].thickness*25, 50)
+        
+            if contact(self.y,self.x,4)!=(0,0):
                 print("Goal")
-                print(contact(self.y,self.x,4))
-                
+                organ=organ_list[contact(self.y,self.x,4)[1]]
+                for x in range(organ.x,organ.x+organ.width):
+                    for y in range(organ.y,organ.y+organ.length):
+                        if contact(self.y,self.x,4)[1]==goal_organ:
+                            Organ(g,y,x,5)
+                        else:
+                            Organ(g,y,x,6)
 #                sys.exit()
 #            flag=0
 #            for d in body[self.y][self.x].directions:
@@ -79,25 +88,25 @@ class Player(pg.sprite.Sprite):
                 return True
         return False    
    
-    def allowed_direction(self,dx=0,dy=0):
-        print(body[self.x][self.y].directions, body[self.x][self.y].t, self.x, self.y)
-        if dx>0:
-            print('r')
-            if 'r' in body[self.y][self.x].directions :
-                return True
-        if dx<0:
-            print('l')
-            if 'l' in body[self.y][self.x].directions :
-                return True
-        if dy>0:
-            print('d')
-            if 'd' in body[self.y][self.x].directions :
-                return True
-        if dy<0:
-            print('u')
-            if 'u' in body[self.y][self.x].directions :
-                return True
-        return False    
+#    def allowed_direction(self,dx=0,dy=0):
+#        print(body[self.x][self.y].directions, body[self.x][self.y].t, self.x, self.y)
+#        if dx>0:
+#            print('r')
+#            if 'r' in body[self.y][self.x].directions :
+#                return True
+#        if dx<0:
+#            print('l')
+#            if 'l' in body[self.y][self.x].directions :
+#                return True
+#        if dy>0:
+#            print('d')
+#            if 'd' in body[self.y][self.x].directions :
+#                return True
+#        if dy<0:
+#            print('u')
+#            if 'u' in body[self.y][self.x].directions :
+#                return True
+#        return False    
         
     def update(self):
         self.rect.x = self.x * TILESIZE
@@ -163,6 +172,28 @@ class Organ(pg.sprite.Sprite):
             self.y = y
             self.rect.x = x * TILESIZE
             self.rect.y = y * TILESIZE   
+        elif val == 5:
+            self.groups = game.all_sprites
+            pg.sprite.Sprite.__init__(self,self.groups)
+            self.game = game
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image.fill(GREEN)
+            self.rect = self.image.get_rect()
+            self.x = x
+            self.y = y
+            self.rect.x = x * TILESIZE
+            self.rect.y = y * TILESIZE   
+        elif val == 6:
+            self.groups = game.all_sprites
+            pg.sprite.Sprite.__init__(self,self.groups)
+            self.game = game
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image.fill(BLACK)
+            self.rect = self.image.get_rect()
+            self.x = x
+            self.y = y
+            self.rect.x = x * TILESIZE
+            self.rect.y = y * TILESIZE   
 
 class Game:
     def __init__(self):
@@ -191,6 +222,7 @@ class Game:
         
         ye,xe = entry_points[np.random.choice(len(entry_points))]
         print(xe,ye)
+        goal_organ = np.random.choice(len(organ_list))
         self.player = Player(self, xe, ye)        
         
     def run(self):
