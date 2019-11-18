@@ -477,11 +477,14 @@ def create_path(x_entry, y_entry, thick, c, inc,cnt):
                 create_path(x_entry,y_entry+length,new_thick,c,not inc,cnt)
             else:
                 create_path(x_entry,y_entry+length,new_thick,c,inc,cnt)
-import numpy as np
+
+'''
+The below functions calculate the cost of moving in a particular direction for the bot.
+'''
 import math
 
 def distance(x,y, xg, yg):
-    return abs(x-xg)+abs(y-yg)
+    return math.sqrt((x-xg)**2+(y-yg)**2)
 
 
 def cost(x,y,xg,yg):
@@ -490,8 +493,9 @@ def cost(x,y,xg,yg):
     cost+=body[x][y].thickness
     if body[x][y].t=='A':
         cost-=5
+
     cost+=0.5*distance(x,y,xg,yg)
-    return cost
+    return round(cost,2)
 
 
     

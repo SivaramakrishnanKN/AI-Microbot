@@ -4,8 +4,16 @@ from settings import *
 from sprites import *
 import numpy as np
 from map import *
-#from snake import *
+import os
 
+def resource_path(relative_path):
+    try:
+    # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -18,7 +26,7 @@ YELLOW = (255, 255, 0)
 PINK = (255,192,203)
 BLUE = (127,255,212)
 ORCHID = (153,50,204)
-HOT_PINK = (255,105,180)
+HOT_PINK = (245,56,121)
 # game settings
 WIDTH = 700   # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
@@ -42,13 +50,14 @@ class Player(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+#        img = pg.image.load('cube_chan.png')
         self.image = pg.Surface((TILESIZE, TILESIZE))
+#        self.image.blit(img)
         self.image.fill(DARKGREY)
         self.score=10000
         self.goal=0
 #        self.image = pg.image.load(os.path.abspath("goku.gif"))
 #        self.image = pg.transform.scale(self.image, (50, 50))
-
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -68,9 +77,11 @@ class Player(pg.sprite.Sprite):
                     for y in range(organ.y,organ.y+organ.length):
                         if contact(self.y,self.x,4)[1]==g.goal_organ:
                             Organ(g,y,x,5)
+                            self.score+=10
                             self.goal=1
                         else:
                             Organ(g,y,x,6)
+                            self.score-=10
                             self.goal=-1
             else:
                 self.goal=0
@@ -300,21 +311,20 @@ class Game:
         scoreboard.fill(DARKGREY)        
         self.screen.blit(scoreboard,(WIDTH,0))
         
-        font = pg.font.Font('Antonio-Regular.ttf',32)
+        font = pg.font.Font('Fonts/Antonio-Regular.ttf',32)
         text = font.render("Scoreboard", True, WHITE)
         TextRect = text.get_rect()
         TextRect.center = (WIDTH+(200/2),40)
         self.screen.blit(text,TextRect)
 
         if self.player.goal==1:
-            font = pg.font.Font('Antonio-Bold.ttf',35)
-            text3 = font.render("SUCCESSFUL", True, GREEN)
+            font = pg.font.Font('Fonts/Antonio-Bold.ttf',35)
+            text3 = font.render("SUCCESS", True, GREEN)
             TextRect = text3.get_rect()
             TextRect.center = (WIDTH+(200/2),600)
             self.screen.blit(text3,TextRect)
         if self.player.goal==-1:
-            self.player.score-=10
-            font = pg.font.Font('Antonio-Bold.ttf',35)
+            font = pg.font.Font('Fonts/Antonio-Bold.ttf',35)
             text3 = font.render("FAILED", True, RED)
             TextRect = text3.get_rect()
             TextRect.center = (WIDTH+(200/2),600)
@@ -328,8 +338,8 @@ class Game:
 #        board = pg.transform.scale(board, (190,80))
 #        self.screen.blit(board, (WIDTH+5,75))
         
-        font = pg.font.Font('digital-7.ttf',35)
-        t=str(self.player.score)
+        font = pg.font.Font('Fonts/digital-7.ttf',35)
+        t=str(round(self.player.score,2))
         text1 = font.render(t, True, WHITE)
         TextRect = text1.get_rect()
         TextRect.center = (WIDTH+(200/2),100)
@@ -345,19 +355,19 @@ class Game:
 
         d = self.player.next
         if d=='d':
-            board = pg.image.load('down.png')
+            board = pg.image.load('Media/down.png')
             board = pg.transform.scale(board, (50,50))
             self.screen.blit(board, (WIDTH+75,300))
         elif d=='u':
-            board = pg.image.load('up.png')
+            board = pg.image.load('Media/up.png')
             board = pg.transform.scale(board, (50,50))
             self.screen.blit(board, (WIDTH+75,200))
         elif d=='l':
-            board = pg.image.load('left.png')
+            board = pg.image.load('Media/left.png')
             board = pg.transform.scale(board, (50,50))
             self.screen.blit(board, (WIDTH+25,250))
         elif d=='r':
-            board = pg.image.load('right.png')
+            board = pg.image.load('Media/right.png')
             board = pg.transform.scale(board, (50,50))
             self.screen.blit(board, (WIDTH+125,250))
         
@@ -370,19 +380,19 @@ class Game:
         
         for d in body[self.player.y][self.player.x].directions:
             if d=='d':
-                board = pg.image.load('down.png')
+                board = pg.image.load('Media/down.png')
                 board = pg.transform.scale(board, (50,50))
                 self.screen.blit(board, (WIDTH+75,500))
             elif d=='u':
-                board = pg.image.load('up.png')
+                board = pg.image.load('Media/up.png')
                 board = pg.transform.scale(board, (50,50))
                 self.screen.blit(board, (WIDTH+75,400))
             elif d=='l':
-                board = pg.image.load('left.png')
+                board = pg.image.load('Media/left.png')
                 board = pg.transform.scale(board, (50,50))
                 self.screen.blit(board, (WIDTH+25,450))
             elif d=='r':
-                board = pg.image.load('right.png')
+                board = pg.image.load('Media/right.png')
                 board = pg.transform.scale(board, (50,50))
                 self.screen.blit(board, (WIDTH+125,450))
 
