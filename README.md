@@ -29,7 +29,7 @@ python setup.py build
 ```
 Now copy the folders labelled "Media" and "Fonts" into "~\...\AI-Microbot\build\exe.win-amd64-3.7" and you're all set to run the game!
 
-Double-click on gui.py to play the game.
+Double-click on gui.exe to play the game.
 
 ## Aim of the Game
  The microbot has been trained by AI to suggest the most optimal direction the Doctor must take to reach the Target Organ by looking ahead with its sensors and deducing the least cost path (heuristic). This isn't always accuracte, which is where the Doctor's discretion comes into play and he makes his own call. It will receive feedback on how successful it's journey has been based on a reward system.
