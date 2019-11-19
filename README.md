@@ -31,4 +31,5 @@ cd ~/.../AI-Microbot
 python setup.py build
 ```
 Now copy the folders labelled "Media" and "Fonts" into "~\...\AI-Microbot\build\exe.win-amd64-3.7" and you're all set to run the game!
+
 Double-click on gui.py to play the game.
